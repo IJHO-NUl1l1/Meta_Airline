@@ -1,67 +1,32 @@
-import {useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
+import './App.css';
 
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend
-} from 'chart.js';
+const TradingViewWidget = ({ symbol }) => {
+  const widgetRef = useRef(null);
 
-import { Line, getElementAtEvent } from 'react-chartjs-2';
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/tv.js';
+    script.async = true;
+    script.onload = () => {
+      new window.TradingView.widget({
+        "container_id": widgetRef.current.id,
+        "symbol": symbol,
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "kr",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "allow_symbol_change": true,
+        "details": true,
+      });
+    };
+    widgetRef.current.appendChild(script);
+  }, [symbol]); // 종목 코드가 변경될 때마다 위젯을 다시 로드합니다.
 
+  return <div ref={widgetRef} id="tradingview-widget-container" />;
+};
 
-ChartJS.register(
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend
-);
-
-function App() {
-  const data = {
-    labels : ['Mon', 'Tue', 'Wed'],
-    datasets : [{
-      label: 'Weekdays',
-      data: [30, 33, 66],
-      borderColor: 'aqua',
-      backgroundColor: 'aqua',
-      tension: 0.4,
-      link: ['https://www.chartjs.org','https://www.chartjs3.com','https://www.google.com']
-    }]
-  }
-
-  const options = {
-
-  }
-
-  const chartRef = useRef();
-  const onClick = (event) => {
-    if(getElementAtEvent(chartRef.current, event).length>0){
-      window.open('https://www.chartjs3.com','_blank')
-    }
-  }
-
-
-  return (
-      <div className='App'>
-        <h1 style={ {padding: '20px'} }>Clickable Links on Line Cahrt with React Chart JS | REACTCHART.COM</h1>
-        <div style={{ width:'80%', padding: '20px', }}>
-          <Line
-            data = {data}
-            options = {options}
-            onClick = {onClick}
-            ref = {chartRef}
-          >
-            
-          </Line>
-        </div>
-      </div>
-  );
-}
-
-export default App;
+export default TradingViewWidget;
