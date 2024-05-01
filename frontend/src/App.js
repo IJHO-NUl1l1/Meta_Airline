@@ -1,11 +1,10 @@
 import { ColorType, createChart } from "lightweight-charts";
 import React from "react";
 import { useEffect } from "react";
-import { useRef, useState  } from "react";
+import { useRef } from "react";
 
 function App(){
-  const chartContainerRef = useRef(null);
-  const [style, setStyle] = useState({});
+  const chartContainerRef = useRef();
 
 
   useEffect(() =>{
@@ -22,29 +21,14 @@ function App(){
       { time: '2018-12-31', value: 22.67 },
     ];
 
-    const adjustPosition = () => {
-      const div = chartContainerRef.current;
-      if (div) {
-        const height = div.offsetHeight;
-        const width = div.offsetWidth;
-        setStyle({
-          position: 'absolute',
-          left: `calc(50% - ${width / 2}px)`,
-          top: `calc(50% - ${height / 2}px)`
-        });
-      }
-    };
-
-    adjustPosition();
-    window.addEventListener('resize', adjustPosition);
 
     const chart = createChart(chartContainerRef.current,{
       layout:{
         background: {type: ColorType.Solid, color: "white"},
       },
 
-      width: 500,
-      height: 200
+      width: chartContainerRef.current.clientWidth,
+      height: 500
     });
 
     const newSeries = chart.addAreaSeries({
@@ -57,13 +41,10 @@ function App(){
     
     return () => [chart.remove()];
     
-    return () => {
-      window.removeEventListener('resize', adjustPosition);
-    };
     
   },[])
 
-  return <div ref={chartContainerRef}style={style}></div>
+  return <div ref={chartContainerRef}></div>
 }
 
 export default App;
